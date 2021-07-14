@@ -1,0 +1,978 @@
+{
+  "description": "A New Flow",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "next": "gather_1",
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingRequest"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    },
+    {
+      "name": "gather_1",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "split_digit_pressed",
+          "event": "keypress"
+        },
+        {
+          "next": "split_user_speaks",
+          "event": "speech"
+        },
+        {
+          "next": "gather_1",
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 140,
+          "y": 220
+        },
+        "loop": 1,
+        "hints": "taxi,payment,driver",
+        "finish_on_key": "#",
+        "say": "Hello. Welcome to Owl taxis.\nPress 1 or say taxi to hire a new taxi.\nPress 2 or say payment to update your payment details.",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-IN",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "split_digit_pressed",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "gather_1",
+          "event": "noMatch"
+        },
+        {
+          "next": "pressed_taxi",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 1",
+              "arguments": [
+                "{{widgets.gather_1.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "pressed_payment",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.gather_1.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.gather_1.Digits}}",
+        "offset": {
+          "x": -1230,
+          "y": -10
+        }
+      }
+    },
+    {
+      "name": "split_user_speaks",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "gather_1",
+          "event": "noMatch"
+        },
+        {
+          "next": "said_taxi",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to taxi",
+              "arguments": [
+                "{{widgets.gather_1.SpeechResult}}"
+              ],
+              "type": "equal_to",
+              "value": "taxi"
+            }
+          ]
+        },
+        {
+          "next": "said_payment",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to payment",
+              "arguments": [
+                "{{widgets.gather_1.SpeechResult}}"
+              ],
+              "type": "equal_to",
+              "value": "payment"
+            }
+          ]
+        },
+        {
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to driver",
+              "arguments": [
+                "{{widgets.gather_1.SpeechResult}}"
+              ],
+              "type": "equal_to",
+              "value": "driver"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.gather_1.SpeechResult}}",
+        "offset": {
+          "x": 339,
+          "y": 466
+        }
+      }
+    },
+    {
+      "name": "pressed_taxi",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "said_taxi",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Kimberly",
+        "offset": {
+          "x": -1480,
+          "y": 450
+        },
+        "loop": 1,
+        "say": "You have selected payment. Please read your credit card number for us to use it.",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "pressed_payment",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "said_payment",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -970,
+          "y": 450
+        },
+        "loop": 1,
+        "say": "You pressed 2"
+      }
+    },
+    {
+      "name": "said_taxi",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "gather_3",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": 300,
+          "y": 760
+        },
+        "loop": 1,
+        "say": "You selected taxi",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "said_payment",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": 680,
+          "y": 760
+        },
+        "loop": 1,
+        "say": "You said payment",
+        "language": "en-US"
+      }
+    },
+    {
+      "name": "gather_3",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "event": "keypress"
+        },
+        {
+          "next": "var_user_name",
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": 242,
+          "y": 995
+        },
+        "hints": "A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z",
+        "finish_on_key": "#",
+        "say": "Please say your name",
+        "language": "en-US",
+        "stop_gather": true,
+        "speech_model": "numbers_and_commands",
+        "profanity_filter": "true",
+        "timeout": 5,
+        "speech_timeout": "auto",
+        "loop": 1,
+        "gather_language": "en-IN"
+      }
+    },
+    {
+      "name": "var_user_name",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "confirm_name",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "{{widgets.gather_3.SpeechResult}}",
+            "key": "username"
+          }
+        ],
+        "offset": {
+          "x": 350,
+          "y": 1220
+        }
+      }
+    },
+    {
+      "name": "confirm_name",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "split_1",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 159,
+          "y": 1440
+        },
+        "loop": 1,
+        "hints": "Yes,No",
+        "finish_on_key": "#",
+        "say": "Your name is {{flow.variables.username}}. \nPlease press 1 to confirm or 2 to repeat.",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-US",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "split_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "gather_address",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to1",
+              "arguments": [
+                "{{widgets.gather_1.Digits}}"
+              ],
+              "type": "not_equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "gather_3",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.gather_1.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.gather_1.Digits}}",
+        "offset": {
+          "x": 140,
+          "y": 1720
+        }
+      }
+    },
+    {
+      "name": "gather_address",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "event": "keypress"
+        },
+        {
+          "next": "confirm_address",
+          "event": "speech"
+        },
+        {
+          "next": "gather_address",
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 170,
+          "y": 2020
+        },
+        "loop": 1,
+        "finish_on_key": "#",
+        "say": "Please tell us your place of pickup",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-IN",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "confirm_address",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "split_address_confirm",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 190,
+          "y": 2300
+        },
+        "loop": 1,
+        "hints": "Yes, No",
+        "finish_on_key": "#",
+        "say": "Your address is {{widgets.gather_address.SpeechResult}}. \nPlease press 1 to confirm or 2 to repeat",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-US",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "split_address_confirm",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "gather_time",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 1",
+              "arguments": [
+                "{{widgets.confirm_address.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "gather_address",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.confirm_address.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.confirm_address.Digits}}",
+        "offset": {
+          "x": 200,
+          "y": 2560
+        }
+      }
+    },
+    {
+      "name": "gather_time",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "event": "keypress"
+        },
+        {
+          "next": "confirm_time",
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 230,
+          "y": 2860
+        },
+        "loop": 1,
+        "finish_on_key": "#",
+        "say": "Please tell us your date and time of pickup",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-IN",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "confirm_time",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "split_time_confirm",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 250,
+          "y": 3120
+        },
+        "loop": 1,
+        "finish_on_key": "#",
+        "say": "Your chosen time is {{widgets.gather_time.SpeechResult}}. \nPlease press 1 to confirm or 2 to repeat",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-US",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "split_time_confirm",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "gather_payment",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 1",
+              "arguments": [
+                "{{widgets.confirm_time.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "gather_time",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.confirm_time.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.confirm_time.Digits}}",
+        "offset": {
+          "x": 220,
+          "y": 3410
+        }
+      }
+    },
+    {
+      "name": "gather_payment",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "split_payment",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 260,
+          "y": 3690
+        },
+        "loop": 1,
+        "hints": "cash,card",
+        "finish_on_key": "#",
+        "say": "Available modes of payment are cash and card.\nPress 1 for cash and 2 for card.",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-US",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "confirm_payment",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "payment_method_cash",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 120,
+          "y": 4200
+        },
+        "loop": 1,
+        "hints": "cash,card",
+        "finish_on_key": "#",
+        "say": "Your chosen payment method is cash\nPlease press 1 to confirm or 2 to repeat.",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-US",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "split_payment_confirm",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "confirm_taxi",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 1",
+              "arguments": [
+                "{{widgets.gather_payment.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "pay_card",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.gather_payment.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.gather_payment.Digits}}",
+        "offset": {
+          "x": 330,
+          "y": 4770
+        }
+      }
+    },
+    {
+      "name": "confirm_taxi",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "success",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -890,
+          "y": 3430
+        },
+        "method": "POST",
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "parameters": [
+          {
+            "value": "{{flow.variables.username}}",
+            "key": "name"
+          },
+          {
+            "value": "{{widgets.gather_address.SpeechResult}}",
+            "key": "pickup"
+          },
+          {
+            "value": "{{widgets.gather_time.SpeechResult}}",
+            "key": "time"
+          },
+          {
+            "value": "{{widgets.gather_payment.Digits}}",
+            "key": "payment_method"
+          }
+        ],
+        "url": "https://d306fdfe7e25.ngrok.io/taxi"
+      }
+    },
+    {
+      "name": "split_payment",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "next": "confirm_payment",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 1",
+              "arguments": [
+                "{{widgets.gather_payment.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "confirm_payment_card",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.gather_payment.Digits}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.gather_payment.Digits}}",
+        "offset": {
+          "x": 270,
+          "y": 3920
+        }
+      }
+    },
+    {
+      "name": "confirm_payment_card",
+      "type": "gather-input-on-call",
+      "transitions": [
+        {
+          "next": "payment_method_card",
+          "event": "keypress"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "speech_timeout": "auto",
+        "offset": {
+          "x": 470,
+          "y": 4200
+        },
+        "loop": 1,
+        "hints": "cash,card",
+        "finish_on_key": "#",
+        "say": "Your chosen payment method is card\nPlease press 1 to confirm or 2 to repeat",
+        "language": "en-US",
+        "stop_gather": true,
+        "gather_language": "en-US",
+        "profanity_filter": "true",
+        "timeout": 5
+      }
+    },
+    {
+      "name": "success",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "send_taxi_confirmation_msg",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -860,
+          "y": 4070
+        },
+        "loop": 1,
+        "say": "Successfully booked Taxi"
+      }
+    },
+    {
+      "name": "send_taxi_confirmation_msg",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -940,
+          "y": 4420
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Hello {{flow.variables.username}},\n\nYour taxi is successfully booked for {{widgets.gather_time.SpeechResult}} .\nYour pickup place is {{widgets.gather_address.SpeechResult}}  and your payment method is {{flow.variables.payment_method}}"
+      }
+    },
+    {
+      "name": "pay_card",
+      "type": "capture-payments",
+      "transitions": [
+        {
+          "next": "confirm_taxi",
+          "event": "success"
+        },
+        {
+          "next": "change_payment_method",
+          "event": "maxFailedAttempts"
+        },
+        {
+          "next": "change_payment_method",
+          "event": "providerError"
+        },
+        {
+          "next": "change_payment_method",
+          "event": "payInterrupted"
+        },
+        {
+          "next": "change_payment_method",
+          "event": "hangup"
+        },
+        {
+          "next": "change_payment_method",
+          "event": "validationError"
+        }
+      ],
+      "properties": {
+        "security_code": true,
+        "offset": {
+          "x": -500,
+          "y": 3670
+        },
+        "max_attempts": 1,
+        "payment_connector": "Stripe_Connector",
+        "payment_amount": "1",
+        "currency": "eur",
+        "language": "en-US",
+        "postal_code": "false",
+        "payment_token_type": "reusable",
+        "timeout": 5,
+        "valid_card_types": [
+          "master-card",
+          "visa"
+        ]
+      }
+    },
+    {
+      "name": "payment_method_cash",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "split_payment_confirm",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "cash",
+            "key": "payment_method"
+          }
+        ],
+        "offset": {
+          "x": 130,
+          "y": 4450
+        }
+      }
+    },
+    {
+      "name": "payment_method_card",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "next": "split_payment_confirm",
+          "event": "next"
+        }
+      ],
+      "properties": {
+        "variables": [
+          {
+            "value": "card",
+            "key": "payment_method"
+          }
+        ],
+        "offset": {
+          "x": 480,
+          "y": 4450
+        }
+      }
+    },
+    {
+      "name": "change_payment_method",
+      "type": "say-play",
+      "transitions": [
+        {
+          "next": "gather_payment",
+          "event": "audioComplete"
+        }
+      ],
+      "properties": {
+        "voice": "Polly.Salli",
+        "offset": {
+          "x": -378,
+          "y": 4055
+        },
+        "loop": 1,
+        "say": "Please change your payment method to continue the booking",
+        "language": "en-US"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
