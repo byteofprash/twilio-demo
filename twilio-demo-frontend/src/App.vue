@@ -30,8 +30,8 @@
           </div>
           <footer class="card-footer">
             <b-button type="is-danger is-light" class="card-footer-item" @click="endSession()">End session</b-button>
-            <b-button icon-left="trash" class="card-footer-item">Call the driver </b-button>
-            <b-button class="card-footer-item"><a href="https://wa.me/14155238886?send='join worker-something'" target="_blank">Whatsapp updates</a></b-button>
+            <b-button icon-left="trash" class="card-footer-item"><a href="tel:+14158436071" target="_blank">Call driver </a> </b-button>
+            <b-button class="card-footer-item"><a href="https://wa.me/14155238886?text=join worker-something" target="_blank">Whatsapp updates</a></b-button>
             <b-button class="card-footer-item"> SMS </b-button>
           </footer>
         </b-collapse>
